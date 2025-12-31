@@ -1,86 +1,71 @@
-# AI Data Analysis Assistant
+# PDF Chat Assistant
 
-A Streamlit application that uses OpenAI to generate and execute pandas code for data analysis. Upload a CSV file, ask questions in natural language, and get instant analysis with visualizations.
+A Streamlit application that allows you to upload PDF files, process them using LangChain and ChromaDB, and chat with them using OpenAI's GPT models. The app provides source citations showing which page each answer came from.
 
 ## Features
 
-- 📁 **CSV File Upload** - Easy file upload interface
-- 👀 **Data Preview** - View first 10 rows and data statistics
-- 💬 **Natural Language Queries** - Ask questions like "What are the top 5 products by revenue?"
-- 🤖 **AI-Powered Code Generation** - Uses OpenAI GPT-4 to generate pandas code
-- ⚙️ **Safe Code Execution** - Executes generated code in a restricted environment
-- 📊 **Multiple Output Formats** - Results displayed as tables, charts, or text
-- 💻 **Code Learning** - View generated code to learn pandas techniques
-- 📚 **Code History** - Keep track of previous analyses
+- 📄 **PDF Upload**: Upload and process PDF files
+- 🔍 **Document Chunking**: Automatically splits PDFs into manageable chunks
+- 💾 **Vector Storage**: Stores embeddings in ChromaDB for efficient retrieval
+- 💬 **Chat Interface**: Interactive chat interface to ask questions about your PDFs
+- 📑 **Source Citation**: Shows which page and section each answer came from
+- 🧠 **Memory**: Maintains conversation context across multiple questions
 
 ## Requirements
 
-- Python 3.11+ (or Python 3.12)
+- Python 3.11
 - OpenAI API key
-- Streamlit
-- Pandas
-- Plotly
 
 ## Installation
 
-1. **Clone or download this repository**
+1. Clone this repository or download the files
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Install the required packages:
+```bash
+pip install -r requirements.txt
+```
 
-3. **Set up your OpenAI API key:**
-   
-   Create a `.env` file in the project root:
-   ```
-   OPENAI_API_KEY=your_api_key_here
-   ```
-   
-   Or set it as an environment variable:
-   ```bash
-   export OPENAI_API_KEY=your_api_key_here
-   ```
+3. Set up your OpenAI API key:
+
+Create a `.env` file in the project directory:
+```
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+Or set it as an environment variable:
+```bash
+# On Windows (PowerShell)
+$env:OPENAI_API_KEY="your_openai_api_key_here"
+
+# On Linux/Mac
+export OPENAI_API_KEY="your_openai_api_key_here"
+```
 
 ## Usage
 
-1. **Run the Streamlit app:**
-   ```bash
-   streamlit run app.py
-   ```
+1. Run the Streamlit app:
+```bash
+streamlit run app.py
+```
 
-2. **Upload a CSV file** using the file uploader
+2. Open your browser and navigate to the URL shown (typically `http://localhost:8501`)
 
-3. **Review the data preview** to understand your dataset
+3. Upload a PDF file using the sidebar
 
-4. **Ask questions** about your data, for example:
-   - "What are the top 5 products by revenue?"
-   - "Show me a trend chart of sales over time"
-   - "What is the average value by category?"
-   - "Create a bar chart of total sales by region"
+4. Click "Process PDF" to process the document
 
-5. **View results** - The app will:
-   - Generate pandas code to answer your question
-   - Execute the code safely
-   - Display results (tables, charts, or text)
-   - Show the generated code for learning
+5. Start asking questions in the chat interface!
 
-## Example Questions
+## How It Works
 
-The app can handle various types of data analysis questions:
-
-- **Aggregations**: "What is the total revenue by category?"
-- **Rankings**: "Show me the top 10 customers by purchase amount"
-- **Time Series**: "Create a line chart showing sales trends over time"
-- **Comparisons**: "Compare average sales across different regions"
-- **Filtering**: "What are the products with sales above $1000?"
-
-## Safety Features
-
-- Code execution is restricted to safe pandas and plotly operations
-- Dangerous built-in functions are blocked
-- Only allowed imports (pandas, plotly) are available
-- Errors are caught and displayed safely
+1. **PDF Processing**: When you upload a PDF, it's loaded and split into chunks using LangChain's `RecursiveCharacterTextSplitter`
+2. **Embedding Generation**: Each chunk is embedded using OpenAI's embeddings model
+3. **Vector Storage**: Embeddings are stored in ChromaDB for fast similarity search
+4. **Question Answering**: When you ask a question:
+   - The question is embedded and used to find the most relevant chunks
+   - The relevant chunks are passed to GPT-3.5-turbo along with the question
+   - The model generates an answer based on the retrieved context
+   - Source information (page numbers and snippets) is extracted and displayed
 
 ## Project Structure
 
@@ -89,18 +74,37 @@ The app can handle various types of data analysis questions:
 ├── app.py              # Main Streamlit application
 ├── requirements.txt    # Python dependencies
 ├── README.md          # This file
-├── .gitignore         # Git ignore rules
-├── .env.example       # Environment variable template
-└── LICENSE            # MIT License
+├── .env               # Environment variables (create this)
+└── chroma_db/         # ChromaDB database (created automatically)
 ```
 
 ## Notes
 
-- The app uses GPT-4 for code generation. Make sure you have API credits available.
-- Large CSV files may take longer to process.
-- The generated code is displayed so you can learn and modify it if needed.
+- The app uses GPT-3.5-turbo for chat. You can modify the model in `app.py` if needed
+- ChromaDB data is persisted in the `chroma_db/` directory
+- Each PDF processing creates chunks that are stored and can be queried
+- The chat maintains context within a session
+
+## Troubleshooting
+
+- **OpenAI API Key Error**: Make sure you've set the `OPENAI_API_KEY` in your `.env` file or environment variables
+- **PDF Processing Error**: Ensure the PDF file is not corrupted or password-protected
+- **Memory Issues**: For very large PDFs, you may need to adjust the chunk size in `app.py`
+
+## Deploying to GitHub
+
+See [DEPLOY.md](DEPLOY.md) for detailed instructions on how to deploy this project to GitHub.
+
+Quick steps:
+1. Install Git from https://git-scm.com/downloads
+2. Initialize repository: `git init`
+3. Add files: `git add .`
+4. Commit: `git commit -m "Initial commit"`
+5. Create repository on GitHub
+6. Push: `git push -u origin main`
+
+**Important**: Never commit your `.env` file with your API key! The `.gitignore` file is already configured to exclude it.
 
 ## License
 
-MIT License - see LICENSE file for details.
-
+MIT License
