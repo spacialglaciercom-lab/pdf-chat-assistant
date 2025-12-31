@@ -18,18 +18,29 @@ import uuid
 load_dotenv()
 
 # Initialize OpenAI API key
-if "OPENAI_API_KEY" not in os.environ:
+api_key = None
+
+# Try to get API key from environment variables first
+if "OPENAI_API_KEY" in os.environ:
+    api_key = os.environ["OPENAI_API_KEY"]
+else:
     # Try Streamlit secrets
     try:
-        api_key = st.secrets.get("OPENAI_API_KEY")
-        if api_key:
-            os.environ["OPENAI_API_KEY"] = api_key
+        api_key = st.secrets.get("OPENAI_API_KEY", None)
     except:
         pass
 
-if "OPENAI_API_KEY" not in os.environ:
-    st.error("Please set OPENAI_API_KEY in your .env file, Streamlit secrets, or environment variables")
-    st.stop()
+# If still not found, ask user to input it
+if not api_key:
+    st.sidebar.title("🔑 API Key Required")
+    api_key = st.sidebar.text_input("Enter your OpenAI API key:", type="password", help="Enter your OpenAI API key to use the app")
+    if api_key:
+        os.environ["OPENAI_API_KEY"] = api_key
+        st.sidebar.success("✅ API key saved for this session")
+    else:
+        st.warning("⚠️ Please enter your OpenAI API key in the sidebar to continue.")
+        st.info("💡 You can also set it via:\n- Streamlit Cloud Secrets (for deployed apps)\n- Environment variable: `OPENAI_API_KEY`\n- `.env` file in the project directory")
+        st.stop()
 
 # Page configuration
 st.set_page_config(
