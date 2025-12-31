@@ -94,9 +94,8 @@ def process_pdf(file) -> List[Document]:
 
 def create_vectorstore(documents: List[Document]):
     """Create ChromaDB vectorstore with documents"""
-    # Initialize embeddings with explicit API key from environment
-    api_key = os.environ.get("OPENAI_API_KEY")
-    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
+    # Initialize embeddings (will use OPENAI_API_KEY from environment)
+    embeddings = OpenAIEmbeddings()
     collection_name = "pdf_chat_collection"
     
     # Create vectorstore
